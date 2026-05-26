@@ -5,14 +5,21 @@
   "type": "module",
   "main": "src/index.ts",
   "scripts": {
-    "generate": "echo 'Phase A — drizzle-kit generate'",
-    "migrate": "echo 'Phase A — drizzle-kit migrate'",
-    "studio": "echo 'Phase A — drizzle-kit studio'",
+    "generate": "drizzle-kit generate",
+    "migrate": "drizzle-kit migrate",
+    "studio": "drizzle-kit studio",
+    "push": "drizzle-kit push",
     "lint": "eslint . --max-warnings 0",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --passWithNoTests"
   },
+  "dependencies": {
+    "@neondatabase/serverless": "^0.10.4",
+    "drizzle-orm": "^0.36.4",
+    "postgres": "^3.4.5"
+  },
   "devDependencies": {
-    "@fortunel/config": "workspace:*"
+    "@fortunel/config": "workspace:*",
+    "drizzle-kit": "^0.28.1"
   }
 }

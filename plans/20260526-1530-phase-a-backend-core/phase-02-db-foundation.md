@@ -1,10 +1,11 @@
 ---
 phase: 2
 title: "DB foundation"
-status: pending
+status: completed
 priority: P1
 effort: "10h"
 dependencies: [1]
+completed: 2026-05-26
 ---
 
 # Phase 2: DB foundation
@@ -87,12 +88,21 @@ Either way, `packages/db/src/client.ts` exposes a single `createClient(url)` fac
 
 ## Success Criteria
 
-- [ ] `pnpm db:up && pnpm db:migrate` creates all tables in local Docker
-- [ ] Same migrations apply cleanly against a fresh Neon branch
-- [ ] `pnpm db:psql` then `\dt` shows: users, api_keys, sessions, accounts, projects, posts, contact_messages
-- [ ] Every non-auth table has `owner_id` column with NOT NULL + FK
-- [ ] `packages/db` exports `createClient`, `schema`, and per-table types
-- [ ] Schema smoke test passes
+- [x] `pnpm db:up && pnpm db:migrate` creates all tables in local Docker
+- [ ] Same migrations apply cleanly against a fresh Neon branch *(not run in this session — requires Neon creds; migration now self-provisions citext via `CREATE EXTENSION IF NOT EXISTS citext` so it should succeed)*
+- [x] `pnpm db:psql` then `\dt` shows: users, api_keys, sessions, accounts, projects, posts, contact_messages
+- [x] Every non-auth table has `owner_id` column with NOT NULL + FK
+- [x] `packages/db` exports `createClient`, `schema`, and per-table types (`createNodeClient` also exported for Node CLI tooling)
+- [x] Schema smoke test passes
+
+## Implementation notes (2026-05-26)
+
+- Driver decision: skipped the 1h Workers spike (cannot deploy from current session); adopted documented fallback per research — `neon-http` on Workers (`createClient`) + `postgres-js` on Node CLI (`createNodeClient`).
+- `users.role` upgraded from `text+enum` to native `pgEnum('user_role', ...)` for DB-level enforcement.
+- Added `sessions_user_id_idx` for logout-all / cascade-lookup performance.
+- All `updated_at` columns use `$onUpdate(() => new Date())` so Drizzle ORM writes bump them automatically.
+- Migration SQL self-provisions citext (`CREATE EXTENSION IF NOT EXISTS citext` prepended) so it works against fresh Neon branches without prior manual setup.
+- `verifications` table deliberately omitted — email verification is OUT OF SCOPE per Phase 5 plan; mapping note added there for Better Auth adapter config (plural→singular table-name override required).
 
 ## Risk Assessment
 

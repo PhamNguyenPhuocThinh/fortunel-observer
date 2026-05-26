@@ -14,6 +14,8 @@ dependencies: [2, 3, 4]
 > **Blocker resolved (Validation Session 1):** scope vocabulary = `posts:read|write`, `projects:read|write`, `contact:read|write`, `signals:read|write`, `*:*`. Codify as a Zod enum in `packages/shared-types/src/primitives.ts` so handlers can typecheck `requireScope(scope)` calls.
 >
 > **Email verification (Validation Session 1):** OUT OF SCOPE for Phase A. `POST /auth/sign-up/email` creates an active user with no email-confirmation gate. Revisit when inviting real users. Do not wire Resend or Better Auth's email-verification plugin in this phase.
+>
+> **Note from Phase 2 implementation (2026-05-26):** the Drizzle adapter must be configured with an explicit schema mapping because our tables use plural names (`users`, `sessions`, `accounts`) while Better Auth defaults expect singular. In `auth/config.ts`, pass `schema: { user: users, session: sessions, account: accounts }` to `drizzleAdapter(...)`. No `verification` table exists — keep email-verification / password-reset / OTP plugins disabled. If they're ever needed, add `verifications` table + a follow-up migration.
 
 <!-- Updated: Validation Session 1 - scope vocab resolved, email verification deferred -->
 
