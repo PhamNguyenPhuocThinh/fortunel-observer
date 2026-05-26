@@ -9,7 +9,7 @@
     "deploy": "wrangler deploy",
     "lint": "eslint . --max-warnings 0",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
     "@hono/zod-openapi": "^0.18.0",
@@ -17,9 +17,7 @@
     "zod": "^3.23.0"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250101.0",
-    "typescript": "^5.6.0",
-    "vitest": "^2.1.0",
+    "@fortunel/config": "workspace:*",
     "wrangler": "^3.90.0"
   }
 }

@@ -9,8 +9,11 @@
   "scripts": {
     "dev": "echo 'Phase B — MCP scaffold not yet generated'",
     "build": "echo 'Phase B — MCP scaffold not yet generated'",
-    "lint": "echo 'skip until Phase B'",
-    "typecheck": "echo 'skip until Phase B'",
-    "test": "echo 'skip until Phase B'"
+    "lint": "eslint . --max-warnings 0",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests"
+  },
+  "devDependencies": {
+    "@fortunel/config": "workspace:*"
   }
 }

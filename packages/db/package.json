@@ -8,8 +8,11 @@
     "generate": "echo 'Phase A — drizzle-kit generate'",
     "migrate": "echo 'Phase A — drizzle-kit migrate'",
     "studio": "echo 'Phase A — drizzle-kit studio'",
-    "lint": "echo 'skip until Phase A schema lands'",
-    "typecheck": "echo 'skip until Phase A schema lands'",
-    "test": "echo 'skip until Phase A schema lands'"
+    "lint": "eslint . --max-warnings 0",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests"
+  },
+  "devDependencies": {
+    "@fortunel/config": "workspace:*"
   }
 }

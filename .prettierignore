@@ -1,0 +1,8 @@
+node_modules
+dist
+.turbo
+.wrangler
+.astro
+coverage
+pnpm-lock.yaml
+apps/bot

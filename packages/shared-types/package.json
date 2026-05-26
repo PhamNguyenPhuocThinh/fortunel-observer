@@ -6,8 +6,11 @@
   "main": "src/index.ts",
   "scripts": {
     "codegen": "echo 'Phase A — Zod → JSON Schema → Pydantic codegen'",
-    "lint": "echo 'skip until Phase A schemas land'",
-    "typecheck": "echo 'skip until Phase A schemas land'",
-    "test": "echo 'skip until Phase A schemas land'"
+    "lint": "eslint . --max-warnings 0",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests"
+  },
+  "devDependencies": {
+    "@fortunel/config": "workspace:*"
   }
 }

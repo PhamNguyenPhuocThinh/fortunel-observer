@@ -5,12 +5,26 @@
   "type": "module",
   "exports": {
     "./eslint/base": "./eslint/base.js",
+    "./eslint/workers": "./eslint/workers.js",
     "./tsconfig/base": "./tsconfig/base.json",
+    "./tsconfig/workers": "./tsconfig/workers.json",
+    "./tsconfig/node": "./tsconfig/node.json",
     "./prettier": "./prettier.config.js"
   },
+  "files": ["eslint", "tsconfig", "prettier.config.js", "vitest.base.ts"],
   "scripts": {
-    "lint": "echo 'config package — nothing to lint'",
-    "typecheck": "echo 'config package — nothing to typecheck'",
-    "test": "echo 'config package — nothing to test'"
+    "lint": "echo 'config package — no source to lint'",
+    "typecheck": "echo 'config package — no source to typecheck'",
+    "test": "echo 'config package — no tests'"
+  },
+  "peerDependencies": {
+    "@eslint/js": "^9.10.0",
+    "@types/node": "^22.0.0",
+    "eslint": "^9.10.0",
+    "globals": "^15.11.0",
+    "prettier": "^3.3.0",
+    "typescript": "^5.6.0",
+    "typescript-eslint": "^8.10.0",
+    "vitest": "^2.1.0"
   }
 }

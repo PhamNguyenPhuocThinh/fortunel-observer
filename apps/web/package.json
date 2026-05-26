@@ -6,8 +6,11 @@
   "scripts": {
     "dev": "echo 'Phase C — Astro scaffold not yet generated'",
     "build": "echo 'Phase C — Astro scaffold not yet generated'",
-    "lint": "echo 'skip until Phase C'",
-    "typecheck": "echo 'skip until Phase C'",
-    "test": "echo 'skip until Phase C'"
+    "lint": "eslint . --max-warnings 0",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests"
+  },
+  "devDependencies": {
+    "@fortunel/config": "workspace:*"
   }
 }

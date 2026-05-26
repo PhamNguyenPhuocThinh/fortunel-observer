@@ -2,16 +2,34 @@
 
 Shared lint/type/format config. Imported by every workspace package so behavior is consistent.
 
-## Phase A exports (planned)
+## Exports
 
-- `eslint/base.js` — shared ESLint flat config (TS, import order, no-floating-promises)
-- `eslint/api.js` — extends base, adds Cloudflare Workers globals
-- `eslint/web.js` — extends base, adds Astro + React
-- `tsconfig/base.json` — strict, ES2022, isolatedModules, noUncheckedIndexedAccess
-- `tsconfig/workers.json` — extends base, Workers types
-- `tsconfig/node.json` — extends base, Node 22 types
-- `prettier.config.js` — 2-space, single quotes, no semi-colons-at-end (TS only — Python uses ruff)
+- `@fortunel/config/eslint/base` — shared ESLint flat config (TS + recommended rules + consistent type imports)
+- `@fortunel/config/eslint/workers` — extends base, adds Cloudflare Workers + browser globals
+- `@fortunel/config/tsconfig/base` — strict, ES2022, isolatedModules, noUncheckedIndexedAccess
+- `@fortunel/config/tsconfig/workers` — extends base, adds Workers types + Hono JSX
+- `@fortunel/config/tsconfig/node` — extends base, adds Node 22 types
+- `@fortunel/config/prettier` — 2-space, single quotes, no trailing semicolons (TS only — Python uses ruff)
+- `vitest.base.ts` — staged for Phase 4 wiring; not yet exported (no consumer until API tests land)
+
+## Usage
+
+Each workspace's `tsconfig.json`:
+
+```json
+{ "extends": "@fortunel/config/tsconfig/workers" }
+```
+
+Each workspace's `eslint.config.js`:
+
+```js
+export { default } from '@fortunel/config/eslint/workers'
+```
 
 ## Rule
 
 If a setting needs to differ per workspace, override in that workspace's local config — don't fork the shared one.
+
+## Hoisting note
+
+Tooling (`eslint`, `typescript-eslint`, `vitest`, etc.) is installed at the repo root and hoisted via `.npmrc` (`shamefully-hoist=true`). The configs in this package import those tools by bare specifier.

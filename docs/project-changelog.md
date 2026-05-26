@@ -9,6 +9,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Version
 ## [Unreleased]
 
 ### Added
+- **Phase A.1 — Workspace bootstrap (2026-05-26):** `@fortunel/config` now ships real shared configs — ESLint flat (`base`, `workers`), tsconfig (`base`, `workers`, `node`), Prettier, and a staged `vitest.base.ts`. Every TS workspace (`apps/{api,web,mcp-server}`, `packages/{db,shared-types}`) extends the shared tsconfig, re-exports the shared ESLint config, and declares `@fortunel/config` as a workspace dep. `pnpm install / lint / typecheck / test` all run real commands (echo only on the config package itself). Root `.npmrc` adopts `shamefully-hoist=true` so tooling (eslint, typescript-eslint, vitest, prettier) lives once at the repo root.
+- Smoke test at `apps/api/src/__tests__/smoke.test.ts` (2 assertions) so `pnpm test` exercises the real Vitest path.
 - Initial monorepo scaffolding (Turborepo + pnpm workspaces).
 - `docs/` baseline: PDR, architecture, API design, code standards, deployment guide, roadmap, AI content guide, `llms.txt`, `llms-full.txt`.
 - `infra/dev/` Docker Compose for local Postgres + TimescaleDB + Adminer.

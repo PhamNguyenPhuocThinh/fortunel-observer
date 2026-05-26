@@ -1,28 +1,30 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "globalDependencies": [".env.example", "tsconfig.json"],
+  "globalDependencies": [".env.example", "tsconfig.json", ".npmrc", "eslint.config.js", ".prettierrc.cjs"],
   "globalEnv": ["NODE_ENV", "DATABASE_URL"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
       "outputs": ["dist/**", ".astro/**", ".wrangler/**"],
-      "inputs": ["src/**", "tsconfig.json", "package.json"]
+      "inputs": ["src/**", "tsconfig.json", "package.json", "*.config.js", "*.config.ts"]
     },
     "dev": {
       "cache": false,
       "persistent": true
     },
     "lint": {
-      "outputs": []
+      "outputs": [],
+      "inputs": ["src/**", "*.config.js", "*.config.cjs", "*.config.mjs", "tsconfig.json", "package.json"]
     },
     "typecheck": {
       "dependsOn": ["^build"],
-      "outputs": []
+      "outputs": [],
+      "inputs": ["src/**", "tsconfig.json", "package.json"]
     },
     "test": {
       "dependsOn": ["^build"],
       "outputs": ["coverage/**"],
-      "inputs": ["src/**", "test/**", "vitest.config.ts"]
+      "inputs": ["src/**", "test/**", "vitest.config.ts", "tsconfig.json", "package.json"]
     },
     "clean": {
       "cache": false

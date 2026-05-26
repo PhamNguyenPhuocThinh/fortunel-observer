@@ -1,0 +1,5 @@
+{
+  "extends": "@fortunel/config/tsconfig/node",
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "dist", ".astro"]
+}
