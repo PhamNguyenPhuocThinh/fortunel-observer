@@ -4,13 +4,20 @@
   "private": true,
   "type": "module",
   "main": "src/index.ts",
+  "sideEffects": false,
   "scripts": {
-    "codegen": "echo 'Phase A — Zod → JSON Schema → Pydantic codegen'",
+    "codegen": "tsx codegen/zod-to-json-schema.ts",
+    "codegen:check": "tsx codegen/zod-to-json-schema.ts --check",
     "lint": "eslint . --max-warnings 0",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --passWithNoTests"
   },
   "devDependencies": {
-    "@fortunel/config": "workspace:*"
+    "@fortunel/config": "workspace:*",
+    "tsx": "^4.22.3"
+  },
+  "dependencies": {
+    "zod": "^3.23.0",
+    "zod-to-json-schema": "^3.25.2"
   }
 }

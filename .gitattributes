@@ -1,0 +1,6 @@
+# Keep generated JSON Schema artifacts at LF so codegen:check never
+# false-positives on Windows checkouts with core.autocrlf=true.
+packages/shared-types/json-schema/*.json text eol=lf
+
+# SQL migrations: same reason.
+packages/db/migrations/*.sql text eol=lf

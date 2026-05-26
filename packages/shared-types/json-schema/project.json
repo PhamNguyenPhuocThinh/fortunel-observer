@@ -1,0 +1,77 @@
+{
+  "$ref": "#/definitions/projectSchema",
+  "definitions": {
+    "projectSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "owner_id": {
+          "$ref": "#/definitions/projectSchema/properties/id"
+        },
+        "slug": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100,
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+        },
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "tech": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "links": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "format": "uri",
+            "maxLength": 2048
+          }
+        },
+        "published_at": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "created_at": {
+          "$ref": "#/definitions/projectSchema/properties/published_at/anyOf/0"
+        },
+        "updated_at": {
+          "$ref": "#/definitions/projectSchema/properties/published_at/anyOf/0"
+        }
+      },
+      "required": [
+        "id",
+        "owner_id",
+        "slug",
+        "title",
+        "description",
+        "tech",
+        "links",
+        "published_at",
+        "created_at",
+        "updated_at"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

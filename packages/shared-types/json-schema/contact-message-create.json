@@ -1,0 +1,44 @@
+{
+  "$ref": "#/definitions/contactMessageCreateSchema",
+  "definitions": {
+    "contactMessageCreateSchema": {
+      "type": "object",
+      "properties": {
+        "from_name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "from_email": {
+          "type": "string",
+          "format": "email",
+          "maxLength": 254
+        },
+        "subject": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 10000
+        }
+      },
+      "required": [
+        "from_name",
+        "from_email",
+        "message"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

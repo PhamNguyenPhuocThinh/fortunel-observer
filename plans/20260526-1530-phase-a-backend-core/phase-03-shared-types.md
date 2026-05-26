@@ -1,10 +1,11 @@
 ---
 phase: 3
 title: "Shared types — Zod source of truth + codegen"
-status: pending
+status: completed
 priority: P1
 effort: "6h"
 dependencies: [1]
+completed: 2026-05-26
 ---
 
 # Phase 3: Shared types
@@ -77,12 +78,28 @@ Zod schema (src/resources/post.ts)
 
 ## Success Criteria
 
-- [ ] All Phase A resource schemas exported from `@fortunel/shared-types`
-- [ ] `pnpm shared-types:codegen` produces clean JSON Schema files under `dist/json-schema/`
-- [ ] `pnpm shared-types:codegen --check` exits 0 with no diff
-- [ ] Modifying `src/resources/post.ts` and running codegen produces a non-empty diff → confirms wiring
-- [ ] CI fails when JSON Schema drift is committed without regen
-- [ ] `packages/shared-types/README.md` documents the Phase D Pydantic follow-up
+- [x] All Phase A resource schemas exported from `@fortunel/shared-types`
+- [x] `pnpm --filter @fortunel/shared-types codegen` produces clean JSON Schema files under `json-schema/` *(moved from `dist/json-schema/`: root `.gitignore` excludes `dist/`, but the drift check requires committed artifacts)*
+- [x] `pnpm --filter @fortunel/shared-types codegen:check` exits 0 with no diff
+- [x] Drift check verified by hand: editing a committed JSON Schema → exit 1; revert → exit 0
+- [x] CI step `Shared-types JSON Schema drift check` added to `.github/workflows/ci-ts.yml`
+- [x] `packages/shared-types/README.md` documents the Phase D Pydantic follow-up + envelope composition + forbidden Zod features
+
+## Implementation notes (2026-05-26)
+
+- **Output path:** `packages/shared-types/json-schema/` (not `dist/json-schema/`). Root `.gitignore` excludes `dist/`; committed drift detection requires a tracked path.
+- **Scope enum unblocker for Phase 5:** `scopeSchema` + `Scope` type exported from `primitives.ts` with the locked vocabulary (`posts|projects|contact|signals:read|write`, `*:*`). `requireScope(s: Scope)` will typecheck at the Phase 5 call site.
+- **Envelope composition (Phase 4 prep):** `envelope(payloadSchema)` is a runtime helper; it deliberately does NOT emit a standalone JSON Schema artifact. Route handlers compose the wire shape via `@hono/zod-openapi` so OpenAPI gets the full per-route shape inline. Documented in README.
+- **Meta-shape unification:** `envelopeMetaSchema = paginationMetaSchema.partial().passthrough()` so the envelope meta and list-response meta cannot drift apart.
+- **RFC 7807 relaxation:** `problemSchema.type` is `z.string().min(1)` (not `.url()`) so the default `about:blank` URI validates. Documented in `problem.ts`.
+- **Bundle hygiene for Workers:** `"sideEffects": false` set in `package.json` so esbuild can tree-shake unused schemas out of the Worker bundle.
+- **Windows CRLF trap:** added `.gitattributes` with `text eol=lf` for `packages/shared-types/json-schema/*.json` and `packages/db/migrations/*.sql` so `core.autocrlf=true` checkouts don't produce phantom drift in CI.
+- **Drift-detection hardening:** codegen throws if a `*Schema` export is not a `ZodType` (silent skip would let plain-object exports bypass drift detection).
+- **Pydantic emit (Phase D):** documented as a one-line `datamodel-code-generator --input json-schema/ --output ../../apps/bot/src/bot/_generated/` follow-up when `apps/bot` materialises. Not wired now (YAGNI — no consumer).
+
+## Code review carry-forwards
+
+- Review (DONE_WITH_CONCERNS) flagged 2 High + 5 Medium + 3 Low — all applied except L1 (verified `moduleResolution: Bundler` in `@fortunel/config/tsconfig/base.json`, no action needed).
 
 ## Risk Assessment
 

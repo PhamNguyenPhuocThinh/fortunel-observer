@@ -1,0 +1,72 @@
+{
+  "$ref": "#/definitions/postSchema",
+  "definitions": {
+    "postSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "owner_id": {
+          "$ref": "#/definitions/postSchema/properties/id"
+        },
+        "slug": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100,
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+        },
+        "title": {
+          "type": "string"
+        },
+        "body_md": {
+          "type": "string"
+        },
+        "excerpt": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "published_at": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "created_at": {
+          "$ref": "#/definitions/postSchema/properties/published_at/anyOf/0"
+        },
+        "updated_at": {
+          "$ref": "#/definitions/postSchema/properties/published_at/anyOf/0"
+        }
+      },
+      "required": [
+        "id",
+        "owner_id",
+        "slug",
+        "title",
+        "body_md",
+        "excerpt",
+        "tags",
+        "published_at",
+        "created_at",
+        "updated_at"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

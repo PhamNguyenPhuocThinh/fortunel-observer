@@ -1,5 +1,5 @@
 {
   "extends": "@fortunel/config/tsconfig/node",
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "codegen/**/*.ts"],
   "exclude": ["node_modules", "dist"]
 }

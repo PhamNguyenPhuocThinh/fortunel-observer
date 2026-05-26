@@ -1,0 +1,74 @@
+{
+  "$ref": "#/definitions/contactMessageSchema",
+  "definitions": {
+    "contactMessageSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "owner_id": {
+          "$ref": "#/definitions/contactMessageSchema/properties/id"
+        },
+        "from_name": {
+          "type": "string"
+        },
+        "from_email": {
+          "type": "string",
+          "format": "email",
+          "maxLength": 254
+        },
+        "subject": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "message": {
+          "type": "string"
+        },
+        "ip": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "user_agent": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "read_at": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "created_at": {
+          "$ref": "#/definitions/contactMessageSchema/properties/read_at/anyOf/0"
+        }
+      },
+      "required": [
+        "id",
+        "owner_id",
+        "from_name",
+        "from_email",
+        "subject",
+        "message",
+        "ip",
+        "user_agent",
+        "read_at",
+        "created_at"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

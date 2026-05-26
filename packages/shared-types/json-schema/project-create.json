@@ -1,0 +1,70 @@
+{
+  "$ref": "#/definitions/projectCreateSchema",
+  "definitions": {
+    "projectCreateSchema": {
+      "type": "object",
+      "properties": {
+        "slug": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100,
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "description": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 2000
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "tech": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 40
+          },
+          "maxItems": 50
+        },
+        "links": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "format": "uri",
+            "maxLength": 2048
+          },
+          "propertyNames": {
+            "minLength": 1,
+            "maxLength": 40
+          }
+        },
+        "published_at": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "slug",
+        "title"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

@@ -73,3 +73,6 @@ jobs:
 
       - name: Test
         run: pnpm test
+
+      - name: Shared-types JSON Schema drift check
+        run: pnpm --filter @fortunel/shared-types codegen:check
