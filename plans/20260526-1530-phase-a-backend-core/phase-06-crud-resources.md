@@ -1,7 +1,8 @@
 ---
 phase: 6
 title: "Repository pattern + CRUD resources"
-status: pending
+status: completed
+completed: 2026-05-26
 priority: P1
 effort: "10h"
 dependencies: [5]

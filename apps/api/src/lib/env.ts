@@ -11,6 +11,7 @@ const envSchema = z.object({
   BETTER_AUTH_URL: z.string().optional(),
   GITHUB_CLIENT_ID: z.string().optional(),
   GITHUB_CLIENT_SECRET: z.string().optional(),
+  TURNSTILE_SECRET_KEY: z.string().optional(),
 })
 
 type ParsedEnv = z.infer<typeof envSchema>
