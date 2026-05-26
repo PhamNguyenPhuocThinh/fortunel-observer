@@ -79,3 +79,7 @@ jobs:
 
       - name: Shared-types JSON Schema drift check
         run: pnpm --filter @fortunel/shared-types codegen:check
+
+      - name: docs/llms.txt drift check (advisory)
+        continue-on-error: true
+        run: pnpm docs:llms:check

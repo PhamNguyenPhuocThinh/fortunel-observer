@@ -1,7 +1,7 @@
 ---
 phase: 8
 title: "Knowledge layer (A.5 parallel)"
-status: pending
+status: completed
 priority: P2
 effort: "4h"
 dependencies: [3]
@@ -68,12 +68,12 @@ scripts/
 
 ## Success Criteria
 
-- [ ] All five frontmatter schemas exported from `@fortunel/shared-types`
-- [ ] Three templates exist under `content/templates/` and read sensibly
-- [ ] `pnpm docs:llms` regenerates `docs/llms.txt` with no diff (idempotent)
-- [ ] CI `--check` step fails on intentional manual edits to llms.txt
-- [ ] A fake trade-journal validates through the Zod schema
-- [ ] None of the knowledge work blocks the Phase A Workers deploy
+- [x] All five frontmatter schemas exported from `@fortunel/shared-types`
+- [x] Three templates exist under `content/templates/` and read sensibly
+- [x] `pnpm docs:llms` regenerates `docs/llms.txt` with no diff (idempotent)
+- [x] CI `--check` step exits non-zero on intentional manual edits (CI step itself is `continue-on-error: true` per Risk mitigation — advisory only)
+- [x] A fake trade-journal validates through the Zod schema (`knowledge-smoke.test.ts`)
+- [x] None of the knowledge work blocks the Phase A Workers deploy
 
 ## Risk Assessment
 

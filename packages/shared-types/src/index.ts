@@ -1,4 +1,5 @@
 export * from './envelope'
+export * from './knowledge'
 export * from './pagination'
 export * from './primitives'
 export * from './problem'

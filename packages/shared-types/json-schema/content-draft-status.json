@@ -1,0 +1,15 @@
+{
+  "$ref": "#/definitions/contentDraftStatusSchema",
+  "definitions": {
+    "contentDraftStatusSchema": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "reviewing",
+        "ready",
+        "published"
+      ]
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

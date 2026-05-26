@@ -26,7 +26,9 @@
     "db:reset": "docker compose -f infra/dev/docker-compose.yml down -v && pnpm db:up",
     "changeset": "changeset",
     "version": "changeset version",
-    "release": "changeset tag"
+    "release": "changeset tag",
+    "docs:llms": "tsx scripts/generate-llms-txt.ts",
+    "docs:llms:check": "tsx scripts/generate-llms-txt.ts --check"
   },
   "devDependencies": {
     "@changesets/cli": "^2.31.0",
@@ -37,6 +39,7 @@
     "eslint": "^9.10.0",
     "globals": "^15.11.0",
     "prettier": "^3.3.0",
+    "tsx": "^4.22.3",
     "turbo": "^2.3.0",
     "typescript": "^5.6.0",
     "typescript-eslint": "^8.10.0",

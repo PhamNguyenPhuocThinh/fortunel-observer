@@ -1,0 +1,63 @@
+{
+  "$ref": "#/definitions/performanceFrontmatterSchema",
+  "definitions": {
+    "performanceFrontmatterSchema": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "performance"
+        },
+        "period": {
+          "type": "string",
+          "pattern": "^(\\d{4}-\\d{2}-\\d{2}|\\d{4}-W\\d{2}|\\d{4}-\\d{2}|\\d{4})$"
+        },
+        "pnl": {
+          "type": "number"
+        },
+        "drawdown_max": {
+          "type": "number",
+          "maximum": 0
+        },
+        "win_rate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "sample_size": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 40
+          },
+          "maxItems": 20,
+          "default": []
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "draft",
+            "published",
+            "archived"
+          ],
+          "default": "draft"
+        }
+      },
+      "required": [
+        "type",
+        "period",
+        "pnl",
+        "drawdown_max",
+        "win_rate",
+        "sample_size"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

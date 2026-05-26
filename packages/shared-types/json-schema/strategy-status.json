@@ -1,0 +1,15 @@
+{
+  "$ref": "#/definitions/strategyStatusSchema",
+  "definitions": {
+    "strategyStatusSchema": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "live",
+        "paused",
+        "retired"
+      ]
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

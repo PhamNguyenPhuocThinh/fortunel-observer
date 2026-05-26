@@ -1,0 +1,49 @@
+{
+  "$ref": "#/definitions/contentDraftFrontmatterSchema",
+  "definitions": {
+    "contentDraftFrontmatterSchema": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "content-draft"
+        },
+        "generated_from": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300,
+            "pattern": "^[a-zA-Z0-9._\\-/]+$"
+          },
+          "minItems": 1,
+          "maxItems": 50
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "draft",
+            "reviewing",
+            "ready",
+            "published"
+          ],
+          "default": "draft"
+        },
+        "source_material_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/contentDraftFrontmatterSchema/properties/generated_from/items"
+          },
+          "maxItems": 50,
+          "default": []
+        }
+      },
+      "required": [
+        "type",
+        "generated_from"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

@@ -1,0 +1,16 @@
+{
+  "$ref": "#/definitions/knowledgeTagsSchema",
+  "definitions": {
+    "knowledgeTagsSchema": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 40
+      },
+      "maxItems": 20,
+      "default": []
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

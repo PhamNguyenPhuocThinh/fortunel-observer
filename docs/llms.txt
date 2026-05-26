@@ -6,20 +6,32 @@ Stack: TypeScript (Hono) on Cloudflare Workers, Drizzle on Postgres (Neon → VP
 
 ## Architecture
 
-- [System architecture](system-architecture.md): layers, deployment matrix, key trade-offs.
-- [API design](api-design.md): REST conventions, response envelope, RFC 7807 errors, MCP tool mapping.
-- [Code standards](code-standards.md): TS + Python conventions, repository pattern, commit format.
+- [System Architecture](system-architecture.md)
+- [API Design](api-design.md): The REST API is the product.
+- [Code Standards](code-standards.md): Read before opening any PR.
 
 ## Product
 
-- [Project overview / PDR](project-overview-pdr.md): what we are building and why.
-- [Project roadmap](project-roadmap.md): phase checklists, status.
-- [AI content guide](ai-content-guide.md): voice + rules for AI-drafted content.
+- [Project Overview - Product Development Requirements](project-overview-pdr.md)
+- [Project Roadmap](project-roadmap.md): Living document.
+- [AI Content Guide](ai-content-guide.md): This document teaches AI drafters (Claude, ChatGPT, custom agents) how to write content **for this brand**.
 
 ## Operations
 
-- [Deployment guide](deployment-guide.md): managed (Phase A-C) and VPS (Phase D+) runbooks.
-- [Project changelog](project-changelog.md): notable changes.
+- [Deployment Guide](deployment-guide.md): Runbooks for the two production topologies: managed (Phase A-C) and hybrid VPS (Phase D+).
+- [Project Changelog](project-changelog.md): All notable changes to `fortunel-observer`.
+
+## Packages
+
+- [@fortunel/config](packages/config): Shared lint/type/format config.
+- [@fortunel/db](packages/db): Drizzle ORM schema + migrations.
+- [@fortunel/shared-types](packages/shared-types): Cross-language schemas.
+
+## Apps
+
+- [@fortunel/api](apps/api): Agent-first REST API on Cloudflare Workers.
+- [@fortunel/mcp-server](apps/mcp-server): Standalone Model Context Protocol server.
+- [@fortunel/web](apps/web): Personal brand site — Astro 5 + React islands + Tailwind v4 + shadcn/ui.
 
 ## Optional
 

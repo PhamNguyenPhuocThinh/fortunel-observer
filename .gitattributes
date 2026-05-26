@@ -4,3 +4,7 @@ packages/shared-types/json-schema/*.json text eol=lf
 
 # SQL migrations: same reason.
 packages/db/migrations/*.sql text eol=lf
+
+# Generated llms.txt: same reason — `pnpm docs:llms:check` would false-positive
+# on Windows checkouts otherwise.
+docs/llms.txt text eol=lf

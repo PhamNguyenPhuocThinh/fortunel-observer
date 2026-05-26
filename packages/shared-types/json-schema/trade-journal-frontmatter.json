@@ -1,0 +1,89 @@
+{
+  "$ref": "#/definitions/tradeJournalFrontmatterSchema",
+  "definitions": {
+    "tradeJournalFrontmatterSchema": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "trade-journal"
+        },
+        "date": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "symbol": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 20
+        },
+        "strategy": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "entry": {
+          "type": "number"
+        },
+        "exit": {
+          "type": "number"
+        },
+        "pnl_pct": {
+          "type": "number"
+        },
+        "hypothesis": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "outcome": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "lessons": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          },
+          "maxItems": 20,
+          "default": []
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 40
+          },
+          "maxItems": 20,
+          "default": []
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "draft",
+            "published",
+            "archived"
+          ],
+          "default": "draft"
+        }
+      },
+      "required": [
+        "type",
+        "date",
+        "symbol",
+        "strategy",
+        "entry",
+        "exit",
+        "pnl_pct",
+        "hypothesis",
+        "outcome"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

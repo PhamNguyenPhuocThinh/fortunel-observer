@@ -1,0 +1,14 @@
+{
+  "$ref": "#/definitions/knowledgeStatusSchema",
+  "definitions": {
+    "knowledgeStatusSchema": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "published",
+        "archived"
+      ]
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}
