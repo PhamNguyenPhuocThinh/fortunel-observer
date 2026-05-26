@@ -1,0 +1,16 @@
+{
+  "name": "@fortunel/config",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./eslint/base": "./eslint/base.js",
+    "./tsconfig/base": "./tsconfig/base.json",
+    "./prettier": "./prettier.config.js"
+  },
+  "scripts": {
+    "lint": "echo 'config package — nothing to lint'",
+    "typecheck": "echo 'config package — nothing to typecheck'",
+    "test": "echo 'config package — nothing to test'"
+  }
+}

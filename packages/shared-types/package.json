@@ -1,0 +1,13 @@
+{
+  "name": "@fortunel/shared-types",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts",
+  "scripts": {
+    "codegen": "echo 'Phase A — Zod → JSON Schema → Pydantic codegen'",
+    "lint": "echo 'skip until Phase A schemas land'",
+    "typecheck": "echo 'skip until Phase A schemas land'",
+    "test": "echo 'skip until Phase A schemas land'"
+  }
+}

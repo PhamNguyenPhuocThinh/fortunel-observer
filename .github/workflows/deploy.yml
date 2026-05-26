@@ -1,0 +1,77 @@
+name: deploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/api/**"
+      - "packages/db/**"
+      - "packages/shared-types/**"
+      - ".github/workflows/deploy.yml"
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Target environment"
+        required: true
+        default: "staging"
+        type: choice
+        options: [staging, prod]
+
+concurrency:
+  group: deploy-${{ github.event.inputs.environment || 'staging' }}
+  cancel-in-progress: false
+
+jobs:
+  deploy-api:
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.event.inputs.environment || 'staging' }}
+      url: https://${{ github.event.inputs.environment == 'prod' && 'api' || 'staging.api' }}.fortunel.dev
+
+    permissions:
+      contents: read
+      deployments: write
+
+    env:
+      ENV_NAME: ${{ github.event.inputs.environment || 'staging' }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.12.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm --filter @fortunel/api build
+
+      - name: Run DB migrations
+        run: pnpm --filter @fortunel/db migrate
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+      - name: Deploy to Cloudflare Workers
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: apps/api
+          command: deploy --env ${{ env.ENV_NAME }}
+
+      - name: Smoke test
+        run: |
+          set -euo pipefail
+          BASE="https://${{ env.ENV_NAME == 'prod' && 'api' || 'staging.api' }}.fortunel.dev"
+          echo "Smoke testing $BASE..."
+          curl -fsS "$BASE/healthz"
+          curl -fsS -o /dev/null "$BASE/openapi.json"
+          curl -fsS -o /dev/null "$BASE/docs"
+          echo "OK"

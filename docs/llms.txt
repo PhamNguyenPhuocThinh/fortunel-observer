@@ -1,0 +1,26 @@
+# fortunel-observer
+
+> Agent-first headless platform: a solopreneur's personal brand site, REST + MCP API, and trading bot. Single-tenant V1 with multi-tenant-ready data model. API is the product — UI, MCP, and bot are all clients of the same versioned surface.
+
+Stack: TypeScript (Hono) on Cloudflare Workers, Drizzle on Postgres (Neon → VPS), Astro 5 web, Python trading bot.
+
+## Architecture
+
+- [System architecture](system-architecture.md): layers, deployment matrix, key trade-offs.
+- [API design](api-design.md): REST conventions, response envelope, RFC 7807 errors, MCP tool mapping.
+- [Code standards](code-standards.md): TS + Python conventions, repository pattern, commit format.
+
+## Product
+
+- [Project overview / PDR](project-overview-pdr.md): what we are building and why.
+- [Project roadmap](project-roadmap.md): phase checklists, status.
+- [AI content guide](ai-content-guide.md): voice + rules for AI-drafted content.
+
+## Operations
+
+- [Deployment guide](deployment-guide.md): managed (Phase A-C) and VPS (Phase D+) runbooks.
+- [Project changelog](project-changelog.md): notable changes.
+
+## Optional
+
+- [llms-full.txt](llms-full.txt): expanded reference for deeper AI context.

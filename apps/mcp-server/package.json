@@ -1,0 +1,16 @@
+{
+  "name": "@fortunel/mcp-server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "fortunel-mcp": "dist/stdio.js"
+  },
+  "scripts": {
+    "dev": "echo 'Phase B — MCP scaffold not yet generated'",
+    "build": "echo 'Phase B — MCP scaffold not yet generated'",
+    "lint": "echo 'skip until Phase B'",
+    "typecheck": "echo 'skip until Phase B'",
+    "test": "echo 'skip until Phase B'"
+  }
+}

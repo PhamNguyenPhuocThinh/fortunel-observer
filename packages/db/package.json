@@ -1,0 +1,15 @@
+{
+  "name": "@fortunel/db",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts",
+  "scripts": {
+    "generate": "echo 'Phase A — drizzle-kit generate'",
+    "migrate": "echo 'Phase A — drizzle-kit migrate'",
+    "studio": "echo 'Phase A — drizzle-kit studio'",
+    "lint": "echo 'skip until Phase A schema lands'",
+    "typecheck": "echo 'skip until Phase A schema lands'",
+    "test": "echo 'skip until Phase A schema lands'"
+  }
+}

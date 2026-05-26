@@ -1,0 +1,9 @@
+# Local-only secrets for `wrangler dev`. Gitignored. Copy to `.dev.vars`.
+DATABASE_URL="postgres://dev:dev@localhost:5432/platform_dev"
+BETTER_AUTH_SECRET="change-me-locally-only"
+BETTER_AUTH_URL="http://localhost:8787"
+GITHUB_CLIENT_ID=""
+GITHUB_CLIENT_SECRET=""
+RESEND_API_KEY=""
+RESEND_FROM_EMAIL="hello@example.com"
+SENTRY_DSN=""

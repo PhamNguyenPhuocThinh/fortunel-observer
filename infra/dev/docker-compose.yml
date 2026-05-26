@@ -1,0 +1,48 @@
+# Local dev stack for fortunel-observer.
+# Boot:    pnpm db:up        (or: docker compose -f infra/dev/docker-compose.yml up -d)
+# Stop:    pnpm db:down
+# psql:    pnpm db:psql
+# Reset:   pnpm db:reset     (DROPS data)
+#
+# TimescaleDB image is used in dev so Phase D code paths (hypertables) work
+# locally without Neon. Phase A-C prod uses Neon, which does NOT support
+# TimescaleDB - we only use the extension once we migrate to the VPS.
+
+services:
+  postgres:
+    image: timescale/timescaledb:2.17.2-pg16
+    container_name: fortunel-postgres-dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: dev
+      POSTGRES_DB: platform_dev
+      # Tune for dev workload; not for prod.
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_dev:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dev -d platform_dev"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  adminer:
+    image: adminer:4-standalone
+    container_name: fortunel-adminer-dev
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      ADMINER_DEFAULT_SERVER: postgres
+      ADMINER_DESIGN: pepa-linha-dark
+
+volumes:
+  postgres_dev:
+    name: fortunel_postgres_dev

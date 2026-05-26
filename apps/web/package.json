@@ -1,0 +1,13 @@
+{
+  "name": "@fortunel/web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "echo 'Phase C — Astro scaffold not yet generated'",
+    "build": "echo 'Phase C — Astro scaffold not yet generated'",
+    "lint": "echo 'skip until Phase C'",
+    "typecheck": "echo 'skip until Phase C'",
+    "test": "echo 'skip until Phase C'"
+  }
+}

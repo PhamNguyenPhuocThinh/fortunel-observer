@@ -1,0 +1,143 @@
+# fortunel-observer — expanded LLM context
+
+This file is a single-document brief for AI agents (Claude, ChatGPT, custom GPTs, n8n, etc.) that need deeper context than `llms.txt` provides. It is intentionally self-contained.
+
+## What this project is
+
+A personal platform for a Vietnamese solopreneur. Three concerns share one codebase:
+
+1. **Personal brand site** — `apps/web` (Astro). Read-only public surface: home, about, work, blog, contact.
+2. **Agent-first API** — `apps/api` (Hono on Cloudflare Workers). Every capability has a REST endpoint and an MCP tool.
+3. **Trading bot** — `apps/bot` (Python). Personal-use only in Phase 1. Ingests OHLCV, runs strategies, emits signals to the API.
+
+The platform is single-tenant in V1 (one owner) but every entity carries `owner_id` so a future rename to `tenant_id` is mechanical.
+
+## Tech stack (locked decisions)
+
+| Layer | Choice |
+|---|---|
+| API runtime | Cloudflare Workers |
+| API framework | Hono + `@hono/zod-openapi` |
+| API validation | Zod |
+| API docs UI | Scalar at `/docs` |
+| Auth (humans) | Better Auth (email/password + GitHub OAuth) |
+| Auth (machines) | API keys, argon2-hashed at rest |
+| ORM | Drizzle |
+| DB | Postgres + TimescaleDB. Neon (phases A-C) → Docker on VPS (phase D+) |
+| DB driver (edge) | `@neondatabase/serverless` → Cloudflare Hyperdrive in Phase D |
+| Cache / rate limit | Cloudflare KV (phase A) → KV + Redis (phase D) |
+| Object storage | Cloudflare R2 |
+| Web framework | Astro 5 + React islands |
+| Web styling | Tailwind v4 + shadcn/ui |
+| Bot language | Python 3.12 (uv, ruff, pytest) |
+| Bot libs | ccxt, pandas, numpy, vectorbt, TA-Lib |
+| Cross-lang types | Zod schemas → JSON Schema → Pydantic v2 |
+| MCP | `@modelcontextprotocol/sdk` |
+| Email | Resend |
+| Monorepo | Turborepo + pnpm workspaces |
+| CI | GitHub Actions |
+| Reverse proxy (Phase D+) | Caddy with auto-TLS |
+| Observability | Workers Analytics, Sentry, Netdata (VPS) |
+
+## API contract essentials
+
+### Response envelope
+```json
+{ "data": { ... } | [ ... ] | null,
+  "meta": { "cursor": "...", "limit": 20 } | null,
+  "errors": null | [ ProblemDetails ] }
+```
+
+### Errors
+RFC 7807, `Content-Type: application/problem+json`:
+```json
+{ "data": null, "meta": null,
+  "errors": [{ "type": "https://api.fortunel.dev/errors/<slug>",
+               "title": "...", "status": 400, "detail": "...",
+               "instance": "/v1/...", "extensions": { ... } }] }
+```
+
+### Pagination
+Cursor only. Query: `?limit=20&cursor=<opaque>`. Response `meta.cursor` is null when no next page.
+
+### Auth on agent calls
+Header: `Authorization: Bearer <api-key>`. Keys carry scopes: `posts:read`, `signals:write`, `*:read`, etc.
+
+### Rate limits
+100 req/min/key. Response carries `X-RateLimit-{Limit,Remaining,Reset}`. 429s include `Retry-After`.
+
+## Domain model (V1)
+
+- **User** — `{ id, email, role, created_at }`.
+- **ApiKey** — `{ id, user_id, hashed_key, scope, last_used_at }`.
+- **Project** — `{ id, owner_id, slug, title, description, tech[], links{} }`.
+- **Post** — `{ id, owner_id, slug, title, body_md, published_at, tags[] }`.
+- **ContactMessage** — `{ id, from, message, created_at }`.
+
+### Coming in Phase D (trading)
+- **DataSource** — `{ id, owner_id, exchange, symbol, timeframe }`.
+- **Candle** — TimescaleDB hypertable, OHLCV time-series.
+- **Signal** — `{ id, owner_id, strategy_id, symbol, side, confidence, generated_at }`.
+- **Order** — `{ id, owner_id, signal_id, exchange, status, executed_at }`.
+- **Strategy** — `{ id, owner_id, name, params, backtest_results }`.
+
+### Coming in Phase E (knowledge)
+- **KnowledgeArtifact** — `{ id, owner_id, type, frontmatter_json, body_md, source }`.
+- **ContentDraft** — `{ id, owner_id, generated_from[], status, body_md }`.
+
+## MCP tools (selection)
+
+Every material REST endpoint has one MCP tool. Names use snake_case `<verb>_<resource>`:
+
+- Posts: `create_post`, `list_posts`, `get_post`, `update_post`, `delete_post`.
+- Projects: `create_project`, `list_projects`, `get_project`, `update_project`, `delete_project`.
+- Signals (Phase D): `list_signals`, `get_signal`.
+- Strategies (Phase D): `backtest_strategy`.
+- Knowledge (Phase E): `ingest_knowledge`, `list_knowledge`, `generate_draft`.
+
+Each tool's description is plain English written for an LLM consumer.
+
+## Build phases
+
+| Phase | Window | Goal |
+|---|---|---|
+| A | Week 1-4 | Backend core: API, auth, CRUD, OpenAPI, rate limit, deploy to Workers |
+| A.5 | Parallel | Knowledge layer scaffolding, llms.txt generator, AI content guide |
+| B | Week 5 | Agent surface: MCP server, llms.txt, webhooks, scoped keys |
+| C | Week 6-8 | Frontend: Astro site, dark mode, RSS, deploy to Pages |
+| D | Month 2-3 | Trading bot + DB migration to VPS Docker |
+| E | Month 3+ | AI content pipeline |
+
+## Critical conventions for AI agents calling this API
+
+1. **Always send `Accept: application/json`.** Errors use `application/problem+json` content-type but the same envelope.
+2. **Handle 429 with `Retry-After`.** Do not retry without backoff.
+3. **Treat 404 as "doesn't exist OR not yours".** Never assume the resource exists if you got 404.
+4. **Pass cursors verbatim.** Do not parse or modify them — they are opaque.
+5. **Use field selection.** Reading whole records when you need three fields wastes the rate-limit budget.
+6. **Webhook signatures.** When subscribing, store the signing secret returned at creation. Verify `X-Fortunel-Signature: sha256=...` on every delivery.
+
+## Non-functional requirements
+
+- API p95 latency < 200 ms at the edge.
+- Uptime 99%.
+- Web Lighthouse: Performance ≥ 95, SEO 100, A11y ≥ 95.
+- Test coverage > 70% on logic.
+- Phase D+ DB backup RPO ≤ 24 h, RTO < 1 h.
+
+## What this project is not
+
+- Not a SaaS for third parties (yet).
+- Not multi-tenant in V1.
+- Not a fund manager — trading is personal-use only in Phase 1.
+- Not opinionated about AI inference inside the API. Bring your own LLM client; the API exposes data, not model calls.
+
+## Where to read more
+
+- [System architecture](system-architecture.md)
+- [API design](api-design.md)
+- [Code standards](code-standards.md)
+- [Project overview / PDR](project-overview-pdr.md)
+- [Deployment guide](deployment-guide.md)
+- [Project roadmap](project-roadmap.md)
+- [AI content guide](ai-content-guide.md)

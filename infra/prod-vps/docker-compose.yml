@@ -1,0 +1,104 @@
+# Production stack for VPS (Phase D+).
+#
+# Layout:
+#   - postgres + redis stay on the internal docker network (no port publish).
+#   - bot connects to postgres + redis over the internal network.
+#   - caddy is the only service with published ports (80/443).
+#   - The API on Cloudflare Workers reaches postgres via Cloudflare Hyperdrive,
+#     not via Caddy. Hyperdrive opens an outbound TCP session that the VPS
+#     allows because the egress rule on Hyperdrive's side is authoritative.
+#
+# Before first boot:
+#   1. cp .env.example .env  and fill in secrets.
+#   2. Edit Caddyfile with real hostnames.
+#   3. Make sure /var/lib/fortunel exists and is writable.
+#
+# Boot:
+#   docker compose up -d
+#
+# Inspect:
+#   docker compose ps
+#   docker compose logs -f <service>
+
+services:
+  postgres:
+    image: timescale/timescaledb:2.17.2-pg16
+    container_name: fortunel-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+      POSTGRES_DB: ${DB_NAME:-platform}
+    volumes:
+      - postgres_prod:/var/lib/postgresql/data
+      - ./postgres-conf/postgresql.conf:/etc/postgresql/postgresql.conf:ro
+    command: ["postgres", "-c", "config_file=/etc/postgresql/postgresql.conf"]
+    networks: [internal]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-platform}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7.4-alpine
+    container_name: fortunel-redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory", "256mb", "--maxmemory-policy", "allkeys-lru"]
+    volumes:
+      - redis_prod:/data
+    networks: [internal]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  bot:
+    build:
+      context: ../../
+      dockerfile: apps/bot/Dockerfile
+    container_name: fortunel-bot
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    env_file:
+      - .env.bot
+    networks: [internal]
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+  caddy:
+    image: caddy:2.8-alpine
+    container_name: fortunel-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"  # HTTP/3
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks: [internal]
+
+networks:
+  internal:
+    name: fortunel_internal
+    driver: bridge
+
+volumes:
+  postgres_prod:
+    name: fortunel_postgres_prod
+  redis_prod:
+    name: fortunel_redis_prod
+  caddy_data:
+    name: fortunel_caddy_data
+  caddy_config:
+    name: fortunel_caddy_config

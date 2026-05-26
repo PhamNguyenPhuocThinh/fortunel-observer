@@ -1,0 +1,39 @@
+# Caddy reverse proxy config for the VPS stack.
+# Replace <your-domain> placeholders before booting.
+#
+# Caddy auto-provisions Let's Encrypt TLS certificates on first request
+# and renews them automatically. Make sure port 80 is reachable from the
+# public internet for the ACME HTTP challenge.
+
+{
+  email ops@<your-domain>
+  # Persist ACME state across container restarts via the caddy_data volume.
+  # Uncomment to use the staging directory while testing:
+  # acme_ca https://acme-staging-v02.api.letsencrypt.org/directory
+}
+
+# Public bot dashboard / status (optional - rate limit and basic auth).
+# Phase D may host the React island for /app here, behind auth.
+app.<your-domain> {
+  encode zstd gzip
+  basicauth /metrics/* {
+    # Generate hash: docker run --rm caddy:2-alpine caddy hash-password
+    admin <bcrypt-hash-here>
+  }
+  reverse_proxy bot:8000
+}
+
+# Netdata host monitoring, behind basic auth.
+vps.<your-domain> {
+  encode zstd gzip
+  basicauth {
+    admin <bcrypt-hash-here>
+  }
+  reverse_proxy host.docker.internal:19999
+}
+
+# Health check endpoint exposed publicly (no auth, no body details).
+health.<your-domain> {
+  respond /healthz "ok" 200
+  respond 404
+}
