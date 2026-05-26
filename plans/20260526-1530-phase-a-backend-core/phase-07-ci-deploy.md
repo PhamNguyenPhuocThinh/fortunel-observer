@@ -1,11 +1,19 @@
 ---
 phase: 7
 title: "CI green + Workers staging deploy"
-status: pending
+status: code-complete
+code_completed: 2026-05-26
 priority: P1
 effort: "6h"
 dependencies: [6]
 ---
+
+> **Status note (2026-05-26):** Code-only scope landed — workflows split per
+> red-team revision, CI runs migrations, deployment guide has secret-rotation
+> procedure + prod approval-gate guidance. Steps 1–5 and 7–10 (Neon/KV/OAuth
+> provisioning, push to verify, manual prod deploy) are deferred to a manual
+> ops session. Phase will move to `completed` after first successful staging
+> deploy.
 
 # Phase 7: CI green + Workers staging deploy
 

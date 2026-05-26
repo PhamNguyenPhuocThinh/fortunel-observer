@@ -47,15 +47,64 @@ Each env has its own Wrangler `[env.<name>]` block, its own KV namespaces, its o
 
 ### Deploy API
 
-CI auto-deploys on push to `main`:
-```yaml
-# .github/workflows/deploy.yml
-- name: Deploy API
-  run: pnpm --filter @fortunel/api deploy --env prod
-  env:
-    CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-```
-Manual: `pnpm --filter @fortunel/api deploy --env prod`.
+CI auto-deploys on push to `main` via `.github/workflows/deploy.yml`. The
+workflow is split into two sequential jobs:
+
+1. **`migrate`** — installs deps, runs `pnpm --filter @fortunel/db migrate`
+   against `DATABASE_URL` (the Neon staging branch by default).
+2. **`deploy`** — gated on `needs: migrate` + `if: success()`. Builds the API,
+   runs `wrangler-action@v3` to push to Workers, then smoke-tests `/healthz`,
+   `/openapi.json`, `/docs` with a 3x/5s retry loop to tolerate cold-start.
+
+Failure semantics: if `migrate` fails, the previous Worker keeps serving
+unchanged — no half-state. If `deploy` fails after a successful migrate, the
+schema is ahead of code; re-run the workflow using **"Re-run failed jobs"**
+(not "Re-run all jobs") so the migration is not re-applied. Migrations are
+additive-only per code-standards, so re-running is also safe — the
+re-run-failed-jobs path is the cheaper default.
+
+Manual prod deploy: trigger `deploy.yml` via `workflow_dispatch` and pick the
+`prod` environment.
+
+> **Prod environment approval (operational note).** Both `migrate` and
+> `deploy` reference the same GitHub Environment (`staging` or `prod`). If a
+> required-reviewer protection rule is enabled on the `prod` environment, the
+> reviewer will be prompted **twice** — once before `migrate`, once before
+> `deploy`. A reviewer who approves migrate and then walks away leaves the
+> schema ahead of code until they return. Before enabling prod approvals, pick
+> one:
+> - Create a separate `prod-migrate` environment without reviewers and update
+>   `deploy.yml` to use it for the migrate job (preferred — keeps the human
+>   gate on the destructive deploy step only).
+> - Accept the double-prompt and document the SLA for the second approval.
+
+### Secret rotation
+
+Every secret falls into one of three buckets — rotate via the matching command.
+
+| Secret | Lives in | Rotate with |
+|---|---|---|
+| `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `DATABASE_URL` | GitHub Actions repo secrets | `gh secret set <NAME> --env <staging\|prod>` (or repo Settings → Secrets) |
+| `BETTER_AUTH_SECRET`, `GITHUB_CLIENT_SECRET`, `RESEND_API_KEY` | Cloudflare Workers (per-env) | `wrangler secret put <NAME> --env <staging\|prod>` |
+| `GITHUB_CLIENT_ID` (non-sensitive) | `apps/api/wrangler.toml` `[env.*.vars]` | edit file, commit, redeploy |
+
+**Procedure:**
+
+1. **Generate** the new value out-of-band (1Password, `openssl rand -hex 32`,
+   provider dashboard). Store it in 1Password *before* rotating live.
+2. **Stage first.** Update the staging secret, redeploy staging, smoke-test
+   `staging.api.fortunel.dev/healthz` and one authenticated endpoint.
+3. **Promote** to prod once staging is green. `wrangler secret put` overwrites
+   atomically — no downtime.
+4. **Revoke** the old value at the provider (Cloudflare token page, GitHub
+   OAuth app, Resend dashboard) only after a clean prod smoke.
+5. **Audit log:** append a one-line entry to `docs/incidents/secret-rotation.md`
+   (date, secret name, reason). Never log the value itself.
+
+Never delete a working secret without storing the value elsewhere first —
+losing `BETTER_AUTH_SECRET` invalidates every active session.
+
+Manual one-off: `pnpm --filter @fortunel/api deploy --env prod`.
 
 ### Deploy Web (Cloudflare Pages)
 

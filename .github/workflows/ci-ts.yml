@@ -71,6 +71,9 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
 
+      - name: Run DB migrations (test database)
+        run: pnpm --filter @fortunel/db migrate
+
       - name: Test
         run: pnpm test
 

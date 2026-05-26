@@ -22,7 +22,44 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  deploy-api:
+  # Split rationale: running migrate + wrangler deploy in one job risks a
+  # half-state where the schema advances but the new code never ships (or
+  # vice-versa). Two sequential jobs gated by `needs:` + `if: success()` mean
+  # a migrate failure leaves the previous Worker live and unchanged.
+  migrate:
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.event.inputs.environment || 'staging' }}
+
+    permissions:
+      contents: read
+
+    env:
+      ENV_NAME: ${{ github.event.inputs.environment || 'staging' }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.12.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Run DB migrations
+        run: pnpm --filter @fortunel/db migrate
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+  deploy:
+    needs: migrate
+    if: success()
     runs-on: ubuntu-latest
     environment:
       name: ${{ github.event.inputs.environment || 'staging' }}
@@ -53,11 +90,6 @@ jobs:
       - name: Build
         run: pnpm --filter @fortunel/api build
 
-      - name: Run DB migrations
-        run: pnpm --filter @fortunel/db migrate
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-
       - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@v3
         with:
@@ -71,7 +103,27 @@ jobs:
           set -euo pipefail
           BASE="https://${{ env.ENV_NAME == 'prod' && 'api' || 'staging.api' }}.fortunel.dev"
           echo "Smoke testing $BASE..."
-          curl -fsS "$BASE/healthz"
-          curl -fsS -o /dev/null "$BASE/openapi.json"
-          curl -fsS -o /dev/null "$BASE/docs"
+
+          # Cold-start tolerance: Workers can take a few seconds to warm after a
+          # fresh deploy. Retry 3x with 5s sleep before failing.
+          smoke() {
+            local url="$1"
+            local attempts=3
+            local i=1
+            while [ $i -le $attempts ]; do
+              if curl -fsS -o /dev/null "$url"; then
+                echo "  OK   $url (attempt $i)"
+                return 0
+              fi
+              echo "  miss $url (attempt $i/$attempts)"
+              if [ $i -lt $attempts ]; then sleep 5; fi
+              i=$((i + 1))
+            done
+            echo "  FAIL $url after $attempts attempts"
+            return 1
+          }
+
+          smoke "$BASE/healthz"
+          smoke "$BASE/openapi.json"
+          smoke "$BASE/docs"
           echo "OK"
