@@ -4,9 +4,11 @@ import { requestId } from './middleware/request-id'
 import { corsMiddleware } from './middleware/cors'
 import { rateLimit } from './middleware/rate-limit'
 import { errorHandler, notFoundHandler } from './middleware/error-envelope'
+import { authMiddleware } from './auth/middleware'
 import { registerHealthRoute } from './routes/health'
 import { registerOpenApiRoute } from './routes/openapi'
 import { registerDocsRoute } from './routes/docs'
+import { registerAuthRoutes } from './routes/auth'
 
 export function buildApp(): OpenAPIHono<AppBindings> {
   const app = new OpenAPIHono<AppBindings>({
@@ -38,7 +40,9 @@ export function buildApp(): OpenAPIHono<AppBindings> {
   app.use('*', requestId())
   app.use('*', corsMiddleware())
   app.use('/v1/*', rateLimit())
+  app.use('/v1/*', authMiddleware())
 
+  registerAuthRoutes(app)
   registerHealthRoute(app)
   registerOpenApiRoute(app)
   registerDocsRoute(app)

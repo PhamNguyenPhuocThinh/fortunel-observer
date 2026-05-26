@@ -1,10 +1,11 @@
 ---
 phase: 5
 title: "Auth surface — Better Auth + API keys"
-status: pending
+status: complete
 priority: P1
 effort: "24h"
 dependencies: [2, 3, 4]
+completed: 2026-05-26
 ---
 
 > **Red-team revisions applied:** added missing dep 3 (scope vocabulary lives in shared-types so handlers can typecheck against it); effort bumped 12h→24h (realistic for Better Auth wiring + OAuth round trip + API key middleware + own KV session cache + integration tests); added requirement for our own KV session cache (Better Auth `cookieCache` is broken per #4203 — without our cache, every protected request hits Postgres for session lookup).

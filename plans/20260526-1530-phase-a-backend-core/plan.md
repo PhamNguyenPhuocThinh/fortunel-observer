@@ -25,7 +25,7 @@ Headless contract: every capability available via REST under `/v1/*`; UI consume
 | 2 | [DB foundation](phase-02-db-foundation.md) ✅ | P1 | 10h | 1 |
 | 3 | [Shared types](phase-03-shared-types.md) ✅ | P1 | 6h | 1 |
 | 4 | [API foundation](phase-04-api-foundation.md) ✅ | P1 | 10h | 2, 3 |
-| 5 | [Auth surface](phase-05-auth-surface.md) | P1 | 24h | 2, 3, 4 |
+| 5 | [Auth surface](phase-05-auth-surface.md) ✅ | P1 | 24h | 2, 3, 4 |
 | 6 | [Repository pattern + CRUD](phase-06-crud-resources.md) | P1 | 10h | 5 |
 | 7 | [CI green + Workers deploy](phase-07-ci-deploy.md) | P1 | 6h | 6 |
 | 8 | [Knowledge layer (A.5 parallel)](phase-08-knowledge-layer-a5.md) | P2 | 4h | 3 |
