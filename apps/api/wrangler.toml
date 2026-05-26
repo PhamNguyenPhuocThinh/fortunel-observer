@@ -11,20 +11,30 @@ CORS_ALLOWED_ORIGINS = "http://localhost:4321,http://localhost:8787"
 
 # Local dev: use .dev.vars (gitignored) for DATABASE_URL, BETTER_AUTH_SECRET, etc.
 
+# KV bindings for local dev — wrangler auto-mocks these to local SQLite when --local is used.
+# Replace IDs with real namespaces from `wrangler kv:namespace create RATE_LIMIT` before staging deploy.
+[[kv_namespaces]]
+binding = "RATE_LIMIT"
+id = "rate_limit_local_placeholder"
+
+[[kv_namespaces]]
+binding = "SESSION_CACHE"
+id = "session_cache_local_placeholder"
+
 # ---- staging ---------------------------------------------------------------
 [env.staging]
 name = "fortunel-api-staging"
 route = { pattern = "staging.api.fortunel.dev/*", zone_name = "fortunel.dev" }
 vars = { NODE_ENV = "staging", LOG_LEVEL = "info", CORS_ALLOWED_ORIGINS = "https://staging.fortunel.dev" }
 
-# KV bindings (IDs paste in after `wrangler kv:namespace create`)
-# [[env.staging.kv_namespaces]]
-# binding = "RATE_LIMIT"
-# id = "<staging-rate-limit-kv-id>"
+# KV bindings — fill IDs after `wrangler kv:namespace create RATE_LIMIT --env staging`
+[[env.staging.kv_namespaces]]
+binding = "RATE_LIMIT"
+id = "REPLACE_WITH_STAGING_RATE_LIMIT_KV_ID"
 
-# [[env.staging.kv_namespaces]]
-# binding = "SESSION_CACHE"
-# id = "<staging-session-kv-id>"
+[[env.staging.kv_namespaces]]
+binding = "SESSION_CACHE"
+id = "REPLACE_WITH_STAGING_SESSION_CACHE_KV_ID"
 
 # R2
 # [[env.staging.r2_buckets]]
@@ -37,13 +47,13 @@ name = "fortunel-api-prod"
 route = { pattern = "api.fortunel.dev/*", zone_name = "fortunel.dev" }
 vars = { NODE_ENV = "production", LOG_LEVEL = "info", CORS_ALLOWED_ORIGINS = "https://fortunel.dev" }
 
-# [[env.prod.kv_namespaces]]
-# binding = "RATE_LIMIT"
-# id = "<prod-rate-limit-kv-id>"
+[[env.prod.kv_namespaces]]
+binding = "RATE_LIMIT"
+id = "REPLACE_WITH_PROD_RATE_LIMIT_KV_ID"
 
-# [[env.prod.kv_namespaces]]
-# binding = "SESSION_CACHE"
-# id = "<prod-session-kv-id>"
+[[env.prod.kv_namespaces]]
+binding = "SESSION_CACHE"
+id = "REPLACE_WITH_PROD_SESSION_CACHE_KV_ID"
 
 # [[env.prod.r2_buckets]]
 # binding = "ASSETS"
